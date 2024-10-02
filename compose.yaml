@@ -1,0 +1,51 @@
+services:
+  nginx:
+    build:
+      dockerfile: docker/nginx/Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.flask_discover.rule=Host(`${COMPOSE_PROJECT_NAME}.local.qks`)
+    volumes:
+      - ./app:/var/www/html/public
+      - ./log/nginx:/var/log/nginx
+    networks:
+      - flask
+      - proxy
+
+  flask:
+    build:
+      context: docker/flask
+    volumes:
+      - ./app:/app
+    ports:
+      - 8000:8000
+    networks:
+      - flask
+      - mysql
+
+  mysql:
+    image: registry.gitlab.com/dev-up/docker/mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: manager
+      MARIADB_DATABASE: manager
+      MARIADB_PASSWORD: manager
+      MARIADB_USER: manager
+      MYSQL_ROOT_HOST: localhost
+    volumes:
+      - ../databases/manager/data:/var/lib/mysql
+    networks:
+      - mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -pmanager | grep 'mysqld is alive' || exit 1" ]
+      interval: 2s
+
+networks:
+  flask:
+    external: false
+  mysql:
+    external: false
+  proxy:
+    external: true
