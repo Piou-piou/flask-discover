@@ -29,11 +29,11 @@ services:
   mysql:
     image: registry.gitlab.com/dev-up/docker/mariadb:latest
     environment:
-      MYSQL_ROOT_PASSWORD: manager
-      MARIADB_DATABASE: manager
-      MARIADB_PASSWORD: manager
-      MARIADB_USER: manager
-      MYSQL_ROOT_HOST: localhost
+      MYSQL_ROOT_PASSWORD:
+      MARIADB_DATABASE:
+      MARIADB_PASSWORD:
+      MARIADB_USER:
+      MYSQL_ROOT_HOST:
     volumes:
       - ../databases/manager/data:/var/lib/mysql
     networks:
